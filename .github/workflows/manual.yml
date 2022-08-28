@@ -22,4 +22,6 @@ jobs:
         NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         NOTE_DATABASE_ID: ${{ secrets.NOTE_DATABASE_ID }}
         TASK_DATABASE_ID: ${{ secrets.TASK_DATABASE_ID }}
-      run: npm run-script runcode 
+      run: 
+        npm install
+        npm run-script runcode 
