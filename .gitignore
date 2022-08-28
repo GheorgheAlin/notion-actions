@@ -2,4 +2,3 @@
 /.history
 /.env
 /src/**/*.js
-/package-lock.json
