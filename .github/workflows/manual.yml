@@ -23,5 +23,4 @@ jobs:
         NOTE_DATABASE_ID: ${{ secrets.NOTE_DATABASE_ID }}
         TASK_DATABASE_ID: ${{ secrets.TASK_DATABASE_ID }}
       run: 
-        npm install
-        npm run-script runcode 
+        npm install && npm run-script runcode 
