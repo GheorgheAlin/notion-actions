@@ -1,6 +1,7 @@
 import "dotenv/config";
-import { Client, collectPaginatedAPI } from "@notionhq/client";
-import { addDays, format, formatISO } from "date-fns";
+import { addDays, formatISO } from "date-fns";
+
+const { Client, collectPaginatedAPI } = require("@notionhq/client")
 
 interface Task {
   title: string;
