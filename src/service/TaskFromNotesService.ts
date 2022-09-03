@@ -30,6 +30,11 @@ export class TaskFromNotesService {
         databaseId: string,
         todo: ToDo
     ): Promise<void> {
+        const isAlreadyProcessed: boolean = await this.isAlreadyProcessed(databaseId, todo);
+        if (isAlreadyProcessed) {
+            return;
+        }
+
         const model: TodoModel = new TodoModel(todo);
         await this.client.createDatabaseEntry(
             databaseId,
@@ -38,9 +43,23 @@ export class TaskFromNotesService {
                 Status: model.asProperty.status(),
                 "Daily Notes": model.asProperty.noteRelation(parentNoteId),
                 "Due Date": model.asProperty.dueDate(),
+                "original_id": model.asProperty.originalId()
             },
             []
         );
+    }
+
+    private async isAlreadyProcessed(
+        databaseId: string,
+        todo: ToDo
+    ): Promise<boolean> {
+        const existingEntry = await this.client.getDatabaseEnties(databaseId, {
+            property: "original_id",
+            rich_text: {
+                equals: todo.id
+            }
+        });
+        return Boolean(existingEntry?.length);
     }
 }
 

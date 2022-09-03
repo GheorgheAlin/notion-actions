@@ -19,6 +19,17 @@ export class TodoModel {
                     ]
                 };
             },
+            originalId: (): PageProperties.RichText => {
+                return {
+                    rich_text: [
+                        {
+                            text: {
+                                content: this.data.id
+                            }
+                        }
+                    ]
+                };
+            },
             status: (): PageProperties.Select => {
                 return {
                     select: {
