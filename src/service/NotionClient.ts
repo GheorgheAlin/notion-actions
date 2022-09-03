@@ -1,6 +1,6 @@
 import { Client } from "@notionhq/client";
-import { ListBlockChildrenResponse, QueryDatabaseResponse, CreatePageParameters } from "@notionhq/client/build/src/api-endpoints";
-import { DatabaseProperty, PageProperty } from "notion-api-types/requests";
+import { ListBlockChildrenResponse, QueryDatabaseResponse, CreatePageParameters, UpdatePageParameters } from "@notionhq/client/build/src/api-endpoints";
+import { PageProperty } from "notion-api-types/requests";
 import { Block, Page } from "notion-api-types/responses";
 
 export class NotionClient {
@@ -48,6 +48,16 @@ export class NotionClient {
         } as CreatePageParameters;
         const response = await this.client.pages.create(request);
         return response.id;
+    }
+
+    public async updatePageProperty(
+        id: string,
+        properties: Record<string, PageProperty>,
+    ) {
+        await this.client.pages.update({
+            page_id: id,
+            properties: properties as any
+        });
     }
 
 }

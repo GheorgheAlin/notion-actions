@@ -11,8 +11,9 @@ const setup = async () => {
   for (const page of dailyNotePages) {
     const todos: Array<ToDo> = await service.getPageTodoBlocks(page.id);
     for (const todo of todos) {
-      await service.createTask(page.id, process.env.TASK_DATABASE_ID!, todo)
+      await service.createTask(page.id, process.env.TASK_DATABASE_ID!, todo);
     }
+    await service.markNoteAsProcessed(page.id);
   }
 }
 

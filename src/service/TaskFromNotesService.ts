@@ -61,5 +61,20 @@ export class TaskFromNotesService {
         });
         return Boolean(existingEntry?.length);
     }
+
+    public async markNoteAsProcessed(id: string): Promise<void> {
+        this.client.updatePageProperty(
+            id,
+            {
+                Status: {
+                    type: "select",
+                    select: {
+                        color: "green",
+                        name: "Processed"
+                    }
+                }
+            }
+        )
+    }
 }
 

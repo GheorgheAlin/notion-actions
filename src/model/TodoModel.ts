@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { Mentions, PageProperties, RichTexts, RichText } from "notion-api-types/requests";
 import { NotionDate } from "notion-api-types/requests/global";
 import { ToDo } from "notion-api-types/responses/blocks";
@@ -6,6 +7,16 @@ import { DateUtils } from "../utils/DateUtils";
 export class TodoModel {
     constructor(private readonly data: ToDo) { }
 
+
+    private get mentionedDate(): Mentions.Date | null {
+
+        const mentionedDates: Mentions.Date[] = this.data.to_do.rich_text
+            .filter((section: RichText) => section.type === "mention")
+            .filter((mention: RichText) => (mention as RichTexts.Mention).mention.type === "date")
+            .map((mention: RichText) => (mention as RichTexts.Mention).mention as Mentions.Date);
+        return mentionedDates?.length ? mentionedDates[0] : null;
+    }
+
     public get asProperty() {
         return {
             title: (): PageProperties.Title => {
@@ -13,7 +24,14 @@ export class TodoModel {
                     title: [
                         {
                             text: {
-                                content: this.data.to_do.rich_text.map((text) => text.plain_text).join(" ")
+                                content: this.data.to_do.rich_text.map((text) => {
+                                    if (text.type === "mention" && (text as RichTexts.Mention).mention.type === "date") {
+                                        const dateMention = (text as RichTexts.Mention).mention as Mentions.Date;
+                                        return format(new Date(dateMention.date.start), "dd-MM-yyyy HH:mm")
+                                    }
+                                    return text.plain_text
+                                }
+                                ).join(" ")
                             }
                         }
                     ]
@@ -48,18 +66,8 @@ export class TodoModel {
                 }
             },
             dueDate: (): PageProperties.Date => {
-                const mentionedDates: Mentions.Date[] = this.data.to_do.rich_text
-                    .filter((section: RichText) => section.type === "mention")
-                    .filter((mention: RichText) => (mention as RichTexts.Mention).mention.type === "date")
-                    .map((mention: RichText) => (mention as RichTexts.Mention).mention as Mentions.Date);
-
-                let dueDate: NotionDate = { start: DateUtils.daysFromDateAsString(7) };
-                if (mentionedDates.length === 1) {
-                    dueDate = mentionedDates[0].date;
-                }
-
                 return {
-                    date: dueDate
+                    date: this.mentionedDate?.date ?? { start: DateUtils.daysFromDateAsString(7) }
                 }
             },
 
