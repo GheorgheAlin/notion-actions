@@ -1,7 +1,8 @@
 import { addDays, formatISO } from "date-fns";
-import { DatabaseProperties, PageProperties } from "notion-api-types/requests";
+import { PageProperties } from "notion-api-types/requests";
 import { Block, Page } from "notion-api-types/responses";
 import { ToDo } from "notion-api-types/responses/blocks";
+import { TodoModel } from "../model/TodoModel";
 import { DateUtils } from "../utils/DateUtils";
 import { NotionClient } from "./NotionClient";
 
@@ -29,37 +30,14 @@ export class TaskFromNotesService {
         databaseId: string,
         todo: ToDo
     ): Promise<void> {
-        const title: PageProperties.Title = {
-            title: [
-                {
-                    text: {
-                        content: todo.to_do.rich_text.map((text) => text.plain_text).join(" ")
-                    }
-                }
-            ]
-        }
+        const model: TodoModel = new TodoModel(todo);
         await this.client.createDatabaseEntry(
             databaseId,
             {
-                Name: title,
-                Status: {
-                    select: {
-                        name: todo.to_do.checked ? "Done" : "Pending",
-                        color: todo.to_do.checked ? "green" : "yellow",
-                    },
-                },
-                "Daily Notes": {
-                    relation: [
-                        {
-                            id: parentNoteId,
-                        },
-                    ],
-                },
-                "Due Date": {
-                    date: {
-                        start: formatISO(addDays(new Date(), 7)),
-                    },
-                },
+                Name: model.asProperty.title(),
+                Status: model.asProperty.status(),
+                "Daily Notes": model.asProperty.noteRelation(parentNoteId),
+                "Due Date": model.asProperty.dueDate(),
             },
             []
         );

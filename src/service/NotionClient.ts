@@ -33,7 +33,7 @@ export class NotionClient {
         return response.results.map((result) => result as Block);
     }
 
-public async createDatabaseEntry(
+    public async createDatabaseEntry(
         databaseId: string,
         properties: Record<string, PageProperty>,
         children: Block[]
@@ -47,7 +47,6 @@ public async createDatabaseEntry(
             children: children.map((block: Block) => block as any),
         } as CreatePageParameters;
         const response = await this.client.pages.create(request);
-        console.log(response)
         return response.id;
     }
 
